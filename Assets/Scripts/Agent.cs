@@ -1,3 +1,4 @@
+// Agent.cs
 using UnityEngine;
 using System.Collections;
 
@@ -26,10 +27,11 @@ public class Agent : MonoBehaviour {
     }
 
     public void MoveTo(int newCell, int newLane) {
+        Vector3 startPosition = transform.position;
+        Vector3 endPosition = new Vector3(newCell, 0, newLane);
+        StartCoroutine(SmoothMove(startPosition, endPosition, moveDuration));
         currentCell = newCell;
         currentLane = newLane;
-        targetPosition = new Vector3(currentCell, 0, currentLane);
-        StartCoroutine(SmoothMove(transform.position, targetPosition, moveDuration));
     }
 
     private IEnumerator SmoothMove(Vector3 start, Vector3 end, float duration) {
