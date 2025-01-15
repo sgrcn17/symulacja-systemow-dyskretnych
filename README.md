@@ -27,7 +27,7 @@ This project is a simulation of a multi-lane road with traffic lights.
 
 ## Example Visualization
 
-![Simulation](presentation.mp4)
+![Simulation](presentation.gif)
 
 ## Authors
 
