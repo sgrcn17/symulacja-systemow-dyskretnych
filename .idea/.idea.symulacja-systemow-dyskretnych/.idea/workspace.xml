@@ -5,10 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2af49d5b-0cf3-44aa-b138-377e47a8e7d4" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Assembly-CSharp.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Assembly-CSharp.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.symulacja-systemow-dyskretnych/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.symulacja-systemow-dyskretnych/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/Agent.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Agent.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/Simulation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Simulation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/SimulationSettings.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/SimulationSettings.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -102,6 +103,8 @@
       <updated>1736878076339</updated>
       <workItem from="1736878078039" duration="8843000" />
       <workItem from="1736893045807" duration="58000" />
+      <workItem from="1736950228354" duration="2026000" />
+      <workItem from="1736952318705" duration="550000" />
     </task>
     <servers />
   </component>

@@ -1,4 +1,5 @@
 using UnityEngine;
+using TMPro;
 
 public class SimulationSettings : MonoBehaviour  {
     [SerializeField] private int cellsCount;
@@ -10,6 +11,9 @@ public class SimulationSettings : MonoBehaviour  {
     [SerializeField] private int lightsDuration;
 
     [SerializeField] private Simulation simulation;
+    
+    [SerializeField] private TMP_Text pSpeedText;
+    [SerializeField] private TMP_Text pLaneText;
 
     private void Start() {
         StartSimulation();
@@ -36,12 +40,14 @@ public class SimulationSettings : MonoBehaviour  {
         lightsCount = int.Parse(value);
     }
     
-    public void UpdatePSpeed(string value) {
-        pSpeed = float.Parse(value);
+    public void UpdatePSpeed(float value) {
+        pSpeed = value;
+        pSpeedText.text = "p speed: " + value.ToString("0.00");
     }
     
-    public void UpdatePLane(string value) {
-        pLane = float.Parse(value);
+    public void UpdatePLane(float value) {
+        pLane = value;
+        pLaneText.text = "p lane: " + value.ToString("0.00");
     }
     
     public void UpdateLightsDuration(string value) {

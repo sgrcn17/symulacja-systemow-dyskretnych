@@ -1,4 +1,3 @@
-// Simulation.cs
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -46,6 +45,12 @@ public class Simulation : MonoBehaviour {
     }
 
     private void InitializeCells() {
+        if (_cells != null) {
+            foreach (var cell in _cells) {
+                Destroy(cell);
+            }
+        }
+
         _occupied = new bool[cellsCount, lanesCount];
         _cells = new GameObject[cellsCount, lanesCount];
         for (int i = 0; i < cellsCount; i++) {
@@ -66,27 +71,33 @@ public class Simulation : MonoBehaviour {
     }
 
     private void InitializeAgents() {
+        if (_agents != null) {
+            foreach (var agent in _agents) {
+                Destroy(agent);
+            }
+        }
+
         _agents = new List<GameObject>();
         for (int i = 0; i < agentsCount; i++) {
-            CreateNewAgent();
+            CreateNewAgent(true);
         }
     }
 
-    private void CreateNewAgent() {
+    private void CreateNewAgent(bool initial = false) {
         int sLane = Random.Range(0, lanesCount);
+        int sCell = initial ? Random.Range(0, cellsCount) : 0;
         int maxSpeed = Random.Range(3, 5);
-        var newAgent = Instantiate(agentObject, new Vector3(0, 0, sLane), Quaternion.identity);
+        var newAgent = Instantiate(agentObject, new Vector3(sCell, 0, sLane), Quaternion.identity);
         newAgent.transform.SetParent(this.transform);
 
         newAgent.TryGetComponent<Agent>(out var agentComponent);
-        agentComponent.Initialize(0, sLane, maxSpeed);
+        agentComponent.Initialize(sCell, sLane, maxSpeed);
 
         _agents.Add(newAgent);
     }
 
     private void Step() {
         ResetOccupiedCells();
-        UpdateOccupiedCells();
         UpdateLights();
         UpdateAgents();
         RemoveAndCreateAgents();
@@ -100,26 +111,18 @@ public class Simulation : MonoBehaviour {
         }
     }
 
-    private void UpdateOccupiedCells() {
-        foreach (var agent in _agents) {
-            agent.TryGetComponent<Agent>(out var agentComponent);
-            _occupied[agentComponent.currentCell, agentComponent.currentLane] = true;
-            agentComponent.nextLane = agentComponent.currentLane;
-        }
-
-        foreach (var agent in _agents) {
-            agent.TryGetComponent<Agent>(out var agentComponent);
-            if (agentComponent.nextLane != agentComponent.currentLane) {
-                MarkLaneChange(agentComponent, agentComponent.nextLane);
-            }
-        }
+    private void UpdateOccupiedCells(Agent agentComponent) {
+        _occupied[agentComponent.currentCell, agentComponent.currentLane] = true;
+        MarkLaneChange(agentComponent, agentComponent.currentLane, agentComponent.nextLane);
     }
 
     private void UpdateLights() {
         for (int i = 0; i < cellsCount; i++) {
             for (int j = 0; j < lanesCount; j++) {
                 _cells[i, j].TryGetComponent<Cell>(out var cellComponent);
-                cellComponent.UpdateLight();
+                if (cellComponent is not null && cellComponent.isLight) {
+                    cellComponent.UpdateLight();
+                }
             }
         }
     }
@@ -129,10 +132,14 @@ public class Simulation : MonoBehaviour {
             agent.TryGetComponent<Agent>(out var agentComponent);
             TryChangeLane(agentComponent);
             UpdateAgentSpeed(agentComponent);
-            
+
             if (agentComponent.currentSpeed == 0) {
                 agentComponent.nextLane = agentComponent.currentLane;
             }
+
+            UpdateOccupiedCells(agentComponent);
+
+            agentComponent.MoveTo(agentComponent.currentCell + agentComponent.currentSpeed, agentComponent.nextLane);
         }
     }
 
@@ -153,11 +160,7 @@ public class Simulation : MonoBehaviour {
                 targetLane = agent.currentLane - 1;
             }
         }
-
-        if (targetLane != agent.currentLane) {
-            MarkLaneChange(agent, targetLane);
-            agent.nextLane = targetLane;
-        }
+        agent.nextLane = targetLane;
     }
 
     private bool CanChangeLane(Agent agent, int targetLane) {
@@ -169,11 +172,14 @@ public class Simulation : MonoBehaviour {
         return true;
     }
 
-    private void MarkLaneChange(Agent agent, int targetLane) {
-        for (int i = agent.currentCell; i <= agent.currentCell + agent.currentSpeed; i++) {
-            if (i < cellsCount) {
-                _occupied[i, targetLane] = true;
-            }
+    private void MarkLaneChange(Agent agent, int currentLane, int targetLane) {
+        for (int i = agent.currentCell; i <= agent.currentCell + agent.currentSpeed / 2; i++) {
+            if (i >= cellsCount) break;
+            _occupied[i, currentLane] = true;
+        }
+        for (int i = agent.currentCell + agent.currentSpeed / 2; i <= agent.currentCell + agent.currentSpeed; i++) {
+            if (i >= cellsCount) break;
+            _occupied[i, targetLane] = true;
         }
     }
 
@@ -190,13 +196,12 @@ public class Simulation : MonoBehaviour {
         if (Random.Range(0f, 1f) < pSpeed) {
             agent.currentSpeed = Mathf.Max(agent.currentSpeed - 1, 0);
         }
-
         for (int i = 1; i <= agent.currentSpeed; i++) {
             int nextCell = agent.currentCell + i;
             if (nextCell < cellsCount) {
-                _cells[nextCell, agent.currentLane].TryGetComponent<Cell>(out var cellComponent);
+                _cells[nextCell, agent.nextLane].TryGetComponent<Cell>(out var cellComponent);
                 if (cellComponent.isLight && !cellComponent.isGreen) {
-                    agent.currentSpeed = i - 1;
+                    agent.currentSpeed = Mathf.Min(agent.currentSpeed, i - 1);
                     break;
                 }
             }
@@ -220,13 +225,5 @@ public class Simulation : MonoBehaviour {
                 agentComponent.MoveTo(agentComponent.currentCell, agentComponent.currentLane);
             }
         }
-    }
-    
-    public void RestartSimulation() {
-        foreach (var agent in _agents) {
-            Destroy(agent);
-        }
-        _agents.Clear();
-        GenerateSimulation();
     }
 }

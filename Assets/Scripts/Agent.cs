@@ -27,11 +27,11 @@ public class Agent : MonoBehaviour {
     }
 
     public void MoveTo(int newCell, int newLane) {
+        currentCell = newCell;
+        currentLane = newLane;
         Vector3 startPosition = transform.position;
         Vector3 endPosition = new Vector3(newCell, 0, newLane);
         StartCoroutine(SmoothMove(startPosition, endPosition, moveDuration));
-        currentCell = newCell;
-        currentLane = newLane;
     }
 
     private IEnumerator SmoothMove(Vector3 start, Vector3 end, float duration) {
